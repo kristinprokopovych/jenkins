@@ -3,8 +3,8 @@ pipeline {
 
     environment {
         // Додаємо креденшіали для Docker
-        DOCKER_CREDENTIALS_ID = 'dockerHub'
-        CONTAINER_NAME = 'kuzma343_kuzma_branch'
+        DOCKER_CREDENTIALS_ID = '41b2ffb4-52fd-4180-849d-8509164cdaca'
+        CONTAINER_NAME = 'kristine2208/jen'
     }
    
 
@@ -26,7 +26,7 @@ pipeline {
             steps {
                 script {
                     // Будуємо Docker зображення
-                    sh 'docker build -t kuzma343/kuzma_branch:version${BUILD_NUMBER} .'
+                    sh 'docker build -t kristine2208/jen${BUILD_NUMBER} .'
                 }
             }
         }
@@ -35,7 +35,7 @@ pipeline {
             steps {
                 script {
                     // Додаємо тег 'latest' до збудованого образу
-                    sh 'docker tag kuzma343/kuzma_branch:version${BUILD_NUMBER} kuzma343/kuzma_branch:latest'
+                    sh 'docker tag kristine2208/jen${BUILD_NUMBER} kristine2208/jen'
                 }
             }
         }
@@ -44,44 +44,19 @@ pipeline {
             steps {
                 script {
                     // Пушимо зображення на Docker Hub
-                    sh 'docker push kuzma343/kuzma_branch:version${BUILD_NUMBER}'
-                    sh 'docker push kuzma343/kuzma_branch:latest'
+                    sh 'docker push kristine2208/jen${BUILD_NUMBER}'
+                    sh 'docker push kristine2208/jen'
                 }
             }
         }
 
-        stage('Зупинка та видалення старого контейнера') {
-            steps {
-                script {
-                    // Спроба зупинити та видалити старий контейнер, якщо він існує
-                    sh """
-                    if [ \$(docker ps -aq -f name=^${CONTAINER_NAME}\$) ]; then
-                        docker stop ${CONTAINER_NAME}
-                        docker rm ${CONTAINER_NAME}
-                    else
-                        echo "Контейнер ${CONTAINER_NAME} не знайдено. Продовжуємо..."
-                    fi
-                    """
-                }
-            }
-        }
 
-             stage('Чистка старих образів') {
-            steps {
-                script {
-                    // Пушимо зображення на Docker Hub
-                    sh 'docker image prune -a --filter "until=24h" --force'
-
-                }
-            }
-        }
-        
         
         stage('Запуск Docker контейнера') {
             steps {
                 script {
                     // Запускаємо Docker контейнер з новим зображенням
-                    sh 'docker run -d -p 8081:80 --name ${CONTAINER_NAME} --health-cmd="curl --fail http://localhost:80 || exit 1" kuzma343/kuzma_branch:version${BUILD_NUMBER}'
+                    sh 'docker run -d -p 8081:80 --name ${CONTAINER_NAME} --health-cmd="curl --fail http://localhost:80 || exit 1" kristine2208/jen${BUILD_NUMBER}'
 
                 }
             }
